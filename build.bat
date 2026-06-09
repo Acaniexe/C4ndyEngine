@@ -11,7 +11,7 @@ if /i "%TARGET%"=="clean" (
     echo [C4ndy] Cleaning build outputs...
     if exist Intermediate rmdir /s /q Intermediate
     if exist Binaries     rmdir /s /q Binaries
-    if exist vc140.pdb    del vc140.pdb
+    if exist vc140.pdb del vc140.pdb
     echo [C4ndy] Clean done.
     exit /b 0
 )
@@ -22,7 +22,7 @@ if /i "%TARGET%"=="cleanall" (
     if exist Binaries     rmdir /s /q Binaries
     if exist Build\bin    rmdir /s /q Build\bin
     if exist Build\obj    rmdir /s /q Build\obj
-    if exist vc140.pdb    del vc140.pdb
+    if exist vc140.pdb del vc140.pdb
     echo [C4ndy] Full clean done.
     exit /b 0
 )
@@ -32,14 +32,18 @@ if /i "%TARGET%"=="buildtool" (
     if exist Intermediate rmdir /s /q Intermediate
     if exist Binaries     rmdir /s /q Binaries
     if exist Build\bin    rmdir /s /q Build\bin
-    if exist Build\obj    rmdir /s /q Build\bin
+    if exist Build\obj    rmdir /s /q Build\obj
 
-    echo [C4ndy] clean done. Building tool...
+    echo [C4ndy] Clean done. Building tool...
     dotnet publish .\Build\C4ndyBuildTool.csproj -c Release -r win-x64 --self-contained ^
         -p:PublishSingleFile=true -o .\Build\bin\win-x64 > nul
-    if exist Build\bin\win-x64\C4ndyBuildTool.exe echo [C4ndy] Build successful.
-    if not exist Build\bin\win-x64\C4ndyBuildTool.exe echo [C4ndy] Build Failed.
-    exit /b 0
+    if exist Build\bin\win-x64\C4ndyBuildTool.exe (
+        echo [C4ndy] Build successful.
+        exit /b 0
+    ) else (
+        echo [C4ndy] Build Failed.
+        exit /b 1
+    )
 )
 
 set TOOL=.\Build\bin\win-x64\C4ndyBuildTool.exe
