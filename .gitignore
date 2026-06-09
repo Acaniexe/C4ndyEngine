@@ -1,0 +1,50 @@
+# Build Outputs
+Binaries/
+Intermediate/
+Build/bin/
+Build/obj/
+
+# Third Party
+Engine/ThirdParty/Vulkan/
+
+# Object / Library Files
+*.obj
+*.o
+*.a
+*.lib
+*.exp
+
+# Executables / Libraries
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Debug / Symbols
+*.pdb
+*.ilk
+
+# C# Build Tool
+**/bin/
+**/obj/
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs / Temp
+*.log
+*.tmp
+*.temp
+
+# Shader Outputs
+*.spv
+
+# Crash Dumps
+*.dmp

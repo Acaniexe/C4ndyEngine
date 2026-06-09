@@ -1,0 +1,96 @@
+{
+  "engine_name": "C4ndyEngine",
+  "version": "0.1.0",
+  "modules": [
+    {
+      "name": "Core",
+      "kind": "StaticLib",
+      "target": "Engine",
+      "source_dirs": ["Engine/Source/Core"],
+      "include_dirs": ["Engine/Source"],
+      "dependencies": [],
+      "defines": ["C4NDY_ENGINE"]
+    },
+    {
+      "name": "Math",
+      "kind": "StaticLib",
+      "target": "Engine",
+      "source_dirs": ["Engine/Source/Math"],
+      "include_dirs": ["Engine/Source"],
+      "dependencies": [],
+      "defines": ["C4NDY_ENGINE"]
+    },
+    {
+      "name": "RHI",
+      "kind": "StaticLib",
+      "target": "Engine",
+      "source_dirs": ["Engine/Source/RHI"],
+      "include_dirs": ["Engine/Source", "Engine/ThirdParty/Vulkan/Include"],
+      "dependencies": ["Core", "Math"],
+      "defines": ["C4NDY_ENGINE", "C4NDY_VULKAN"]
+    },
+    {
+      "name": "Renderer",
+      "kind": "StaticLib",
+      "target": "Engine",
+      "source_dirs": ["Engine/Source/Renderer"],
+      "include_dirs": ["Engine/Source", "Engine/ThirdParty/Vulkan/Include"],
+      "dependencies": ["Core", "Math", "RHI"],
+      "defines": ["C4NDY_ENGINE"]
+    },
+    {
+      "name": "Physics",
+      "kind": "StaticLib",
+      "target": "Engine",
+      "source_dirs": ["Engine/Source/Physics"],
+      "include_dirs": ["Engine/Source"],
+      "dependencies": ["Core", "Math"],
+      "defines": ["C4NDY_ENGINE"]
+    },
+    {
+      "name": "Audio",
+      "kind": "StaticLib",
+      "target": "Engine",
+      "source_dirs": ["Engine/Source/Audio"],
+      "include_dirs": ["Engine/Source"],
+      "dependencies": ["Core"],
+      "defines": ["C4NDY_ENGINE"]
+    },
+    {
+      "name": "Assets",
+      "kind": "StaticLib",
+      "target": "Engine",
+      "source_dirs": ["Engine/Source/Assets"],
+      "include_dirs": ["Engine/Source"],
+      "dependencies": ["Core", "RHI"],
+      "defines": ["C4NDY_ENGINE"]
+    },
+    {
+      "name": "ECS",
+      "kind": "StaticLib",
+      "target": "Engine",
+      "source_dirs": ["Engine/Source/ECS"],
+      "include_dirs": ["Engine/Source"],
+      "dependencies": ["Core", "Math"],
+      "defines": ["C4NDY_ENGINE"]
+    },
+    {
+      "name": "Editor",
+      "kind": "Executable",
+      "target": "Editor",
+      "source_dirs": ["Editor/Source"],
+      "include_dirs": ["Engine/Source", "Editor/Source"],
+      "dependencies": ["Core", "Math", "RHI", "Renderer", "Physics", "Audio", "Assets", "ECS"],
+      "defines": ["C4NDY_EDITOR"]
+    },
+    {
+      "name": "Sandbox",
+      "kind": "Executable",
+      "target": "Sandbox",
+      "source_dirs": ["Sandbox/Source"],
+      "include_dirs": ["Engine/Source"],
+      "dependencies": ["Core", "Math", "RHI", "Renderer", "Physics", "Audio", "Assets", "ECS"],
+      "defines": ["C4NDY_SANDBOX"]
+    }
+  ]
+}
