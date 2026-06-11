@@ -22,7 +22,7 @@ namespace C4ndy
         switch (level)
         {
             case LogLevel::Info:    colour = C4NDY_COLOR_WHITE;   prefix = "[INFO]  "; break;
-            case LogLevel::Warn: colour = C4NDY_COLOR_YELLOW;  prefix = "[WARN]  "; break;
+            case LogLevel::Warn:    colour = C4NDY_COLOR_YELLOW;  prefix = "[WARN]  "; break;
             case LogLevel::Error:   colour = C4NDY_COLOR_RED;     prefix = "[ERROR]  "; break;
             case LogLevel::Fatal:   colour = C4NDY_COLOR_MAGENTA; prefix = "[FATAL]  "; break;
         }
