@@ -87,7 +87,7 @@ using isize = ptrdiff_t;
     C4NDY_NON_MOVEABLE(ClassName)
 
 #define C4NDY_BIT(x)         (1u << (x))
-#define C4NDY_HAS_FLAG(v, f) (((V) & (f)) == (f))
+#define C4NDY_HAS_FLAG(v, f) (((v) & (f)) == (f))
 
 #define C4NDY_UNUSED(x) (void)(x)
 
