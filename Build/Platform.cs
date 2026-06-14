@@ -85,7 +85,7 @@ public class Platform
     public static string[] DebugFlags => OS switch
     {
         HostPlatform.Windows => [],
-        _ => ["-g", "-O0", "-D-DEBUG"]
+        _ => ["-g", "-O0", "-D_DEBUG"]
     };
 
     public static string[] ReleaseFlags => OS switch
