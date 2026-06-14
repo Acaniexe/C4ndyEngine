@@ -2,6 +2,12 @@
 
 #if defined(_WIN32) || defined(_WIN64)
     #define C4NDY_PLATFORM_WINDOWS 1
+    #ifndef UNICODE
+        #define UNICODE
+    #endif
+    #ifndef _UNICODE
+        #define _UNICODE
+    #endif
 #elif defined(__APPLE__) && defined(__MACH__)
     #define C4NDY_PLATFORM_MACOS 1
 #elif defined(__linux__)

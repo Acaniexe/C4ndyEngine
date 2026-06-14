@@ -40,6 +40,7 @@ namespace C4ndy
 
     bool Application::OnWindowClose(WindowCloseEvent& e)
     {
+        C4NDY_UNUSED(e);
         m_Running = false;
         return true;
     }

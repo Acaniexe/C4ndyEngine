@@ -1,3 +1,5 @@
+#include "Core.h"
+
 #if defined(C4NDY_PLATFORM_WINDOWS)
 
 #include "Window.h"
@@ -13,13 +15,18 @@ namespace C4ndy
         explicit WindowsWindow(const WindowDesc& desc)
             : m_Width(desc.Width), m_Height(desc.Height), m_VSync(desc.VSync)
         {
-            WNDCLASS wc = {};
+            WNDCLASSEX wc = {};
+            wc.cbSize = sizeof(WNDCLASSEX);
             wc.lpfnWndProc = WindowsWindow::WndProcStatic;
             wc.hInstance = GetModuleHandle(nullptr);
             wc.lpszClassName = L"C4ndyWindowClass";
-            RegisterClass(&wc);
+            wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
             std::wstring title(desc.Title.begin(), desc.Title.end());
+
+            ATOM classAtom = RegisterClassEx(&wc);
+            if (classAtom == 0) 
+                Logger::Get().Error("RegisterClass failed: " + std::to_string(GetLastError()));
 
             m_Hwnd = CreateWindowEx(
                 0, L"C4ndyWindowClass", title.c_str(),
@@ -28,6 +35,12 @@ namespace C4ndy
                 (int)desc.Width, (int)desc.Height,
                 nullptr, nullptr, GetModuleHandle(nullptr), this
             );
+
+            if (m_Hwnd == nullptr)
+                Logger::Get().Error("CreatedWindowEx failed: " + std::to_string(GetLastError()));
+            else
+                Logger::Get().Info("Window Created! HWND valid.");
+
 
             ShowWindow(m_Hwnd, SW_SHOW);
         }
@@ -70,12 +83,12 @@ namespace C4ndy
             }
 
             if (window)
-                return window->HandleMessage(msg, wParam, lParam);
+                return window->HandleMessage(hwnd, msg, wParam, lParam);
             
             return DefWindowProc(hwnd, msg, wParam, lParam);
         }
 
-        LRESULT HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam)
+        LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             switch (msg)
             {
@@ -163,7 +176,7 @@ namespace C4ndy
                     return 0;
                 }
             }
-            return DefWindowProc(m_Hwnd, msg, wParam, lParam);
+            return DefWindowProc(hwnd, msg, wParam, lParam);
         }
 
         HWND m_Hwnd = nullptr;

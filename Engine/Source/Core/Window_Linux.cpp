@@ -1,3 +1,5 @@
+#include "Core.h"
+
 #if defined(C4NDY_PLATFORM_LINUX)
 
 #include "Window.h"
