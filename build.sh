@@ -38,6 +38,7 @@ if [ ! -f "$TOOL" ]; then
         -p:PublishSingleFile=true \
         -p:InvariantGlobalization=true \
         -o "./Build/bin/${RID}" > /dev/null
+    chmod +x "$TOOL"
 fi
 
 "$TOOL" "$TARGET" "$CONFIG"
