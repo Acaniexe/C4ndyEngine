@@ -32,3 +32,8 @@ namespace C4ndy
         bool _fileLoggingEnabled = false;
     };
 }
+
+#define C4NDY_INFO(...)  ::C4ndy::Logger::Get().Info (__VA_ARGS__)
+#define C4NDY_WARN(...)  ::C4ndy::Logger::Get().Warn (__VA_ARGS__)
+#define C4NDY_ERROR(...) ::C4ndy::Logger::Get().Error(__VA_ARGS__)
+#define C4NDY_FATAL(...) ::C4ndy::Logger::Get().Fatal(__VA_ARGS__)
