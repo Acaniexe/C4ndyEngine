@@ -125,7 +125,7 @@ namespace C4ndy::RHI
     void VulkanContext::DestroyDebugMessenger()
     {
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)
-            vkGetInstanceProcAddr (m_Instance, "VkDestroyDebugUtilsMessengerEXT");
+            vkGetInstanceProcAddr (m_Instance, "vkDestroyDebugUtilsMessengerEXT");
         if (func)
             func(m_Instance, m_DebugMessenger, nullptr);
     }
