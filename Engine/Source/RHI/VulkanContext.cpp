@@ -5,7 +5,7 @@
 #if defined(C4NDY_PLATFORM_WINDOWS)
     #include <Windows.h>
     #include <vulkan/vulkan_win32.h>
-#elif defines(C4NDY_PLATFORM_LINUX)
+#elif defined(C4NDY_PLATFORM_LINUX)
     #include <xcb/xcb.h>
     #include <vulkan/vulkan_xcb.h>
 #endif
@@ -125,20 +125,20 @@ namespace C4ndy::RHI
     void VulkanContext::DestroyDebugMessenger()
     {
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)
-            vkGetInstanceProcAddr (m_Instance, "ckDestroyDebugUtilsMessengerEXT");
+            vkGetInstanceProcAddr (m_Instance, "VkDestroyDebugUtilsMessengerEXT");
         if (func)
             func(m_Instance, m_DebugMessenger, nullptr);
     }
 
     void VulkanContext::CreateSurface(void* windowHandle)
     {
-    #if defines(C4NDY_PLATFORM_WINDOWS)
-        vkWin32SurfaceCreateInfoKHR createInfo{};
+    #if defined(C4NDY_PLATFORM_WINDOWS)
+        VkWin32SurfaceCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
         createInfo.hwnd = (HWND)windowHandle;
-        createInfo.hInstance = GetModuleHandle(nullptr);
+        createInfo.hinstance = GetModuleHandle(nullptr);
 
-        if (vkCreateWin32SurfaceKHR(m_Instance, &createInfo, nullptr, &m_Surface) != CK_SUCCESS)
+        if (vkCreateWin32SurfaceKHR(m_Instance, &createInfo, nullptr, &m_Surface) != VK_SUCCESS)
             C4NDY_FATAL("Failed to create Win32 Vulkan surface!");
     #elif defined(C4NDY_PLATFORM_LINUX)
         struct LinuxWindowHandle { void* display; unsigned long window; };
@@ -147,13 +147,13 @@ namespace C4ndy::RHI
         VkXcbSurfaceCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
         createInfo.connection = (xcb_connection_t*)handle->display;
-        create.window = (xcb_window_t)handle->window;
+        createInfo.window = (xcb_window_t)handle->window;
 
         if (vkCreateXcbSurfaceKHR(m_Instance, &createInfo, nullptr, &m_Surface) != VK_SUCCESS)
             C4NDY_FATAL("Failed to create linux Vulkan Surface!");
     #endif
 
-        C4NDY_INFO("Vulkan surface create.");
+        C4NDY_INFO("Vulkan surface created.");
     }
 
     void VulkanContext::PickPhysicalDevice()
@@ -249,6 +249,6 @@ namespace C4ndy::RHI
         vkGetDeviceQueue(m_Device, m_GraphicsQueueFamily, 0, &m_GraphicsQueue);
         vkGetDeviceQueue(m_Device, m_PresentQueueFamily, 0, &m_PresentQueue);
 
-        C4NDY_INFO("Vulkan logicval device created.");
+        C4NDY_INFO("Vulkan logical device created.");
     }
 }
