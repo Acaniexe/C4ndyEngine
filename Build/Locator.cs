@@ -10,6 +10,16 @@ public static class Locator
             return [];
         if (_cachedEnv is not null) return _cachedEnv;
 
+        string? clOnPath = FindOnPath("cl.exe");
+        if (clOnPath != null)
+        {
+            BuildUtils.Info("MSVC already on PATH - using current enviroment.");
+            _cachedEnv = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (System.Collections.DictionaryEntry e in System.Environment.GetEnvironmentVariables())
+                _cachedEnv[(string)e.Key] = (string)(e.Value ?? "");
+            return _cachedEnv;
+        }
+
         string? vsPath = FindVisualStudio();
         if (vsPath is null)
         {
@@ -27,6 +37,18 @@ public static class Locator
         BuildUtils.Info($"Found MSVC at: { vsPath}");
         _cachedEnv = SourceBatchFile(vcvars, "x64");
         return _cachedEnv;
+    }
+
+    private static string? FindOnPath(string exe)
+    {
+        string? pathVar = System.Environment.GetEnvironmentVariable("PATH");
+        if (pathVar == null) return null;
+        foreach (var dir in pathVar.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            string full = Path.Combine(dir.Trim(), exe);
+            if (File.Exists(full)) return full;
+        }
+        return null;
     }
 
     private static string? FindVisualStudio()
