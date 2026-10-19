@@ -101,7 +101,7 @@ public class Compiler
         if (Platform.OS == HostPlatform.Windows)
         {
             args.AddRange(["/nologo", "/std:c++20", "/W4", "/WX-", "/MP", "/EHsc", "/utf-8"]);
-            args.AddRange(_config == "Release" ? ["/O2", "/DNDEBUG", "/MD"] : ["/Od", "/Zi", "/D_DEBUG", "/MDd"]);
+            args.AddRange(_config == "Release" ? ["/O2", "/DNDEBUG", "/MD"] : ["/Od", "/Zi", "/D_DEBUG", "/MTd"]);
 
             foreach (var inc in m.IncludeDirs) args.Add($"/I\"{inc}\"");
             foreach (var def in m.Defines) args.Add($"/D{def}");
