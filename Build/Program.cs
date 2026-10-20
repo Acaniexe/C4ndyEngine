@@ -56,6 +56,12 @@ class Program
             Console.WriteLine($"   - {m.Name} ({m.Kind})");
         Console.WriteLine();
 
+        if (!ShaderCompiler.CompileAll(root))
+        {
+            BuildUtils.Error("Shader compilation failed.");
+            return 1;
+        }
+
         var compiler = new Compiler(root, config);
         bool success = compiler.BuildAll(modules);
 
