@@ -1,5 +1,6 @@
 #include "VulkanBuffer.h"
 #include <Core/Logger.h>
+#include <cstring>
 
 namespace C4ndy::RHI
 {
