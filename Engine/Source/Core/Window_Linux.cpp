@@ -28,6 +28,9 @@ namespace C4ndy
                 BlackPixel(m_Display, screen), BlackPixel(m_Display, screen)
             );
 
+            m_NativeHandle.display = m_Display;
+            m_NativeHandle.window = m_Window;
+
             XStoreName(m_Display, m_Window, desc.Title.c_str());
 
             XSelectInput(m_Display, m_Window,
@@ -63,6 +66,7 @@ namespace C4ndy
         void SetEventCallback(const EventCallbackFn& cb) override { m_EventCallback = cb; }
         void SetVSync(bool enabled) override { m_VSync = enabled; }
         bool IsVSync() const override { return m_VSync; }
+        void* GetNativeHandle() const override { return (void*)&m_NativeHandle; }
 
     private:
         void HandleEvent(const XEvent& ev)
@@ -164,6 +168,12 @@ namespace C4ndy
         bool m_VSync;
         bool m_ShouldClose = false;
         EventCallbackFn m_EventCallback;
+
+        struct NativeHandle
+        {
+            Display* display;
+            ::Window window;
+        } m_NativeHandle;
     };
 
     Scope<Window> Window::Create(const WindowDesc& desc)

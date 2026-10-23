@@ -66,6 +66,7 @@ namespace C4ndy
         void SetEventCallback(const EventCallbackFn& cb) override { m_EventCallback = cb; }
         void SetVSync(bool enabled) override { m_VSync = enabled; }
         bool IsVSync() const override { return m_VSync; }
+        void* GetNativeHandle() const override { return (void*)m_Hwnd; }
 
     private:
         static LRESULT CALLBACK WndProcStatic(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

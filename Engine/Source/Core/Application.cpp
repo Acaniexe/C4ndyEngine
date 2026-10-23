@@ -22,9 +22,14 @@ namespace C4ndy
         while (m_Running)
         {
             m_Timer.Tick();
-
             m_Window->OnUpdate();
             Input::Update();
+
+            if (m_Renderer.BeginFrame())
+            {
+                vkCmdDraw(m_Renderer.GetCommandBuffer(), 3, 1, 0, 0);
+                m_Renderer.EndFrame();
+            }
 
             if (m_Window->ShouldClose())
                 m_Running = false;

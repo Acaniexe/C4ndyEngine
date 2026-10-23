@@ -14,6 +14,9 @@ namespace C4ndy
         Logger::Get().Fatal("macOS Windowing not yet implemented!");
         return nullptr;
     }
+
+    //For future Vulkan window Renderering
+    //void* GetNativeHandle() const override { return nullptr; }
 }
 
 #endif

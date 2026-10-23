@@ -1,4 +1,5 @@
 #pragma once
+#include <Renderer/Renderer.h>
 #include "Core.h"
 #include "Window.h"
 #include "Timer.h"
@@ -21,5 +22,6 @@ namespace C4ndy
         Scope<Window> m_Window;
         Timer m_Timer;
         bool m_Running = true;
+        Renderer::Renderer m_Renderer;
     };
 }
