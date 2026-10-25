@@ -28,7 +28,7 @@ namespace C4ndy::RHI
         VulkanContext* m_Context = nullptr;
         VkPipeline m_Pipeline = VK_NULL_HANDLE;
         VkPipelineLayout m_PipelineLayout = VK_NULL_HANDLE;
-        VkPipelineShaderStageCreateInfo m_ShdaerStages[2]{};
+        VkPipelineShaderStageCreateInfo m_ShaderStages[2]{};
         VkRenderPass m_RenderPass = VK_NULL_HANDLE;
         VkDescriptorSetLayout m_DescriptorLayout = VK_NULL_HANDLE;
         VkExtent2D m_Extent{};

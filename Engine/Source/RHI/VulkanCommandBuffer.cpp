@@ -3,6 +3,9 @@
 
 namespace C4ndy::RHI
 {
+
+    VulkanCommandBuffer::VulkanCommandBuffer() = default;
+    
     void VulkanCommandBuffer::Init(VulkanContext& context)
     {
         m_Context = &context;

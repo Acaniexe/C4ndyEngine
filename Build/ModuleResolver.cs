@@ -8,6 +8,8 @@ public class ResolvedModule
     public List<string> IncludeDirs { get; set; } = new();
     public List<string> Dependencies { get; set; } = new();
     public List<string> Defines { get; set; } = new();
+    public List<string> Libs { get; init; } = new();
+    public List<string> LibDirs { get; init; } = new();
 }
 
 public class ModuleResolver
@@ -67,6 +69,8 @@ public class ModuleResolver
             IncludeDirs = includes,
             Dependencies = m.Dependencies,
             Defines = m.Defines,
+            Libs = m.Libs,
+            LibDirs = m.LibDirs.Select(d => Path.GetFullPath(Path.Combine(_root, d))).ToList(),
         };
     }
 }

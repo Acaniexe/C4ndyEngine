@@ -3,6 +3,9 @@
 
 namespace C4ndy::RHI
 {
+
+    VulkanDescriptor::VulkanDescriptor() = default;
+    
     void VulkanDescriptor::Init(VulkanContext& context)
     {
         m_Context = &context;

@@ -4,6 +4,9 @@
 
 namespace C4ndy::RHI
 {
+
+    VulkanRenderPass::VulkanRenderPass() = default;
+    
     void VulkanRenderPass::Init(VulkanContext& context, VkFormat colorFormat, VkFormat depthFormat)
     {
         m_Context = &context;

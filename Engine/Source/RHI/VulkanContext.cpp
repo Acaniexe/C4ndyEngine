@@ -12,6 +12,9 @@
 
 namespace C4ndy::RHI
 {
+
+    VulkanContext::VulkanContext() = default;
+    
     void VulkanContext::Init(void* windowHandle)
     {
         CreateInstance();
@@ -56,6 +59,21 @@ namespace C4ndy::RHI
             "VK_MVK_macos_surface",
     #endif
         };
+
+        if (k_EnableValidation)
+        {
+            u32 layerCount;
+            vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+            std::vector<VkLayerProperties> layers(layerCount);
+            vkEnumerateInstanceLayerProperties(&layerCount, layers.data());
+
+            bool found = false;
+            for (const auto& layer : layers)
+                if (strcmp(layer.layerName, k_ValidationLayer) == 0) { found = true; break; }
+
+            if (!found)
+                C4NDY_WARN("Validation layer not available - running without it.");
+        }
 
         if (k_EnableValidation)
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);

@@ -4,6 +4,9 @@
 
 namespace C4ndy::RHI
 {
+
+    VulkanSwapchain::VulkanSwapchain() = default;
+
     void VulkanSwapchain::Init(VulkanContext& context, u32 width, u32 height)
     {
         m_Context = &context;
@@ -183,7 +186,7 @@ namespace C4ndy::RHI
         return imageIndex;
     }
 
-    void VulkanSwapchain::Present(VkSemaphore renderFinishedSemaphore, u32 imageIndex)
+    bool VulkanSwapchain::Present(VkSemaphore renderFinishedSemaphore, u32 imageIndex)
     {
         VkPresentInfoKHR presentInfo{};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -196,8 +199,12 @@ namespace C4ndy::RHI
         VkResult result = vkQueuePresentKHR(m_Context->GetPresentQueue(), &presentInfo);
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-            C4NDY_WARN("Swapchain suboptimal or out of date during present!");
+        {
+            C4NDY_WARN("Swapchain out of date or suboptimal; recreating.");
+            return true;
+        }
         else if (result != VK_SUCCESS)
             C4NDY_FATAL("Failed to present swapchain image!");
+        return false;
     }
 }

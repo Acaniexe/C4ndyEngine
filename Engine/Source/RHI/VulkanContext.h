@@ -24,7 +24,7 @@ namespace C4ndy::RHI
 
     private:
         #ifdef _DEBUG
-            static constexpr bool k_EnableValidation = true;
+            static constexpr bool k_EnableValidation = false;
         #else
             static constexpr bool k_EnableValidation = false;
         #endif

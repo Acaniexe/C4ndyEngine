@@ -7,7 +7,7 @@
       "kind": "StaticLib",
       "target": "Engine",
       "source_dirs": ["Engine/Source/Core"],
-      "include_dirs": ["Engine/Source"],
+      "include_dirs": ["Engine/Source", "Engine/ThirdParty/Vulkan/Include"],
       "dependencies": [],
       "defines": ["C4NDY_ENGINE"]
     },
@@ -16,7 +16,7 @@
       "kind": "StaticLib",
       "target": "Engine",
       "source_dirs": ["Engine/Source/Math"],
-      "include_dirs": ["Engine/Source"],
+      "include_dirs": ["Engine/Source", "Engine/ThirdParty/Vulkan/Include"],
       "dependencies": [],
       "defines": ["C4NDY_ENGINE"]
     },
@@ -52,7 +52,7 @@
       "kind": "StaticLib",
       "target": "Engine",
       "source_dirs": ["Engine/Source/Audio"],
-      "include_dirs": ["Engine/Source"],
+      "include_dirs": ["Engine/Source", "Engine/ThirdParty/Vulkan/Include"],
       "dependencies": ["Core"],
       "defines": ["C4NDY_ENGINE"]
     },
@@ -61,7 +61,7 @@
       "kind": "StaticLib",
       "target": "Engine",
       "source_dirs": ["Engine/Source/Assets"],
-      "include_dirs": ["Engine/Source"],
+      "include_dirs": ["Engine/Source", "Engine/ThirdParty/Vulkan/Include"],
       "dependencies": ["Core", "RHI"],
       "defines": ["C4NDY_ENGINE"]
     },
@@ -70,7 +70,7 @@
       "kind": "StaticLib",
       "target": "Engine",
       "source_dirs": ["Engine/Source/ECS"],
-      "include_dirs": ["Engine/Source"],
+      "include_dirs": ["Engine/Source", "Engine/ThirdParty/Vulkan/Include"],
       "dependencies": ["Core", "Math"],
       "defines": ["C4NDY_ENGINE"]
     },
@@ -79,7 +79,9 @@
       "kind": "Executable",
       "target": "Editor",
       "source_dirs": ["Editor/Source"],
-      "include_dirs": ["Engine/Source", "Editor/Source"],
+      "include_dirs": ["Engine/Source", "Editor/Source", "Engine/ThirdParty/Vulkan/Include"],
+      "lib_dirs": ["Engine/ThirdParty/Vulkan/Lib/Win"],
+      "libs": ["vulkan-1.lib"],
       "dependencies": ["Core", "Math", "RHI", "Renderer", "Physics", "Audio", "Assets", "ECS"],
       "defines": ["C4NDY_EDITOR"]
     },
@@ -88,7 +90,9 @@
       "kind": "Executable",
       "target": "Sandbox",
       "source_dirs": ["Sandbox/Source"],
-      "include_dirs": ["Engine/Source"],
+      "include_dirs": ["Engine/Source", "Engine/ThirdParty/Vulkan/Include"],
+      "lib_dirs": ["Engine/ThirdParty/Vulkan/Lib/Win"],
+      "libs": ["vulkan-1.lib"],
       "dependencies": ["Core", "Math", "RHI", "Renderer", "Physics", "Audio", "Assets", "ECS"],
       "defines": ["C4NDY_SANDBOX"]
     }

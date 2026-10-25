@@ -137,6 +137,8 @@ public class Compiler
                 args.AddRange(objs.Select(o => $"\"{o}\""));
                 foreach (var dep in m.Dependencies)
                     if (libOutputs.TryGetValue(dep, out var lib)) args.Add($"\"{lib}\"");
+                foreach (var lib in m.Libs) args.Add($"\"{lib}\"");
+                foreach (var dir in m.LibDirs) args.Add($"/LIBPATH:\"{dir}\"");
                 args.AddRange(Platform.SystemLibs);
                 return RunProcess(Platform.LD, string.Join(" ", args));
             }

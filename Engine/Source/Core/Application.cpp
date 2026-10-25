@@ -1,9 +1,25 @@
 #include "Application.h"
 #include "Logger.h"
 #include "Input.h"
+#include <filesystem>
 
 namespace C4ndy
 {
+    std::string Application::s_ExecutablePath;
+
+    void Application::SetExecutablePath(const char* path)
+    {
+        if (path == nullptr || path[0] == '\0')
+        {
+            s_ExecutablePath.clear();
+            C4NDY_WARN("Executable path was empty; Shader path resolution may fail.");
+            return;
+        }
+
+        s_ExecutablePath = std::filesystem::absolute(path).lexically_normal().string();
+        C4NDY_INFO("Executable path: " + s_ExecutablePath);
+    }
+
     Application::Application()
     {
         WindowDesc desc;
@@ -13,6 +29,8 @@ namespace C4ndy
 
         m_Window = Window::Create(desc);
         m_Window->SetEventCallback([this](Event& e) { OnEvent(e); });
+
+        m_Renderer.Init(*m_Window);
 
         Logger::Get().Info("Application started.");
     }
@@ -52,6 +70,7 @@ namespace C4ndy
 
     void Application::Close()
     {
+        m_Renderer.Shutdown();
         m_Running = false;
     }
 }

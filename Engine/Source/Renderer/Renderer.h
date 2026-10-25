@@ -21,6 +21,8 @@ namespace C4ndy::Renderer
         VkCommandBuffer GetCommandBuffer() const { return m_CommandBuffer.GetCommandBuffer(); }
 
     private:
+        Window* m_Window = nullptr;
+        
         RHI::VulkanContext m_Context;
         RHI::VulkanSwapchain m_Swapchain;
         RHI::VulkanRenderPass m_RenderPass;
@@ -32,8 +34,8 @@ namespace C4ndy::Renderer
 
         struct ShaderProgram
         {
-            RHI::VulkanShader vert;
-            RHI::VulkanShader frag;
+            Scope<RHI::VulkanShader> vert;
+            Scope<RHI::VulkanShader> frag;
         };
 
         std::unordered_map<std::string, ShaderProgram> m_Shaders;

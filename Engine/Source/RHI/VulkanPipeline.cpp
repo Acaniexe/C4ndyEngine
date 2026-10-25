@@ -3,6 +3,9 @@
 
 namespace C4ndy::RHI
 {
+
+    VulkanPipeline::VulkanPipeline() = default;
+
     void VulkanPipeline::Init(VulkanContext& context) 
     {
         m_Context = &context;
@@ -17,8 +20,8 @@ namespace C4ndy::RHI
 
     void VulkanPipeline::SetShaders(VulkanShader& vert, VulkanShader& frag)
     {
-        m_ShdaerStages[0] = vert.GetStageInfo();
-        m_ShdaerStages[1] = frag.GetStageInfo();
+        m_ShaderStages[0] = vert.GetStageInfo();
+        m_ShaderStages[1] = frag.GetStageInfo();
     }
 
     void VulkanPipeline::SetRenderPass(VulkanRenderPass& renderPass) 
@@ -46,6 +49,14 @@ namespace C4ndy::RHI
         VkPipelineVertexInputStateCreateInfo vertexInfo{};
         vertexInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         
+        std::array<VkDynamicState, 2> dynamicStates = {
+            VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR
+        };
+
+        VkPipelineDynamicStateCreateInfo dynamicState{};
+        dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+        dynamicState.dynamicStateCount = (u32)dynamicStates.size();
+        dynamicState.pDynamicStates = dynamicStates.data();
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -73,7 +84,8 @@ namespace C4ndy::RHI
         VkPipelineRasterizationStateCreateInfo rasterizer{};
         rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+        //rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+        rasterizer.cullMode = VK_CULL_MODE_NONE;
         rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.lineWidth = 1.0f;
 
@@ -111,7 +123,7 @@ namespace C4ndy::RHI
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipelineInfo.stageCount = 2;
-        pipelineInfo.pStages = m_ShdaerStages;
+        pipelineInfo.pStages = m_ShaderStages;
         pipelineInfo.pVertexInputState = &vertexInfo;
         pipelineInfo.pInputAssemblyState = &inputAssembly;
         pipelineInfo.pViewportState = &viewportState;
@@ -122,6 +134,7 @@ namespace C4ndy::RHI
         pipelineInfo.layout = m_PipelineLayout;
         pipelineInfo.renderPass = m_RenderPass;
         pipelineInfo.subpass = 0;
+        pipelineInfo.pDynamicState = &dynamicState;
 
         if (vkCreateGraphicsPipelines(m_Context->GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_Pipeline) != VK_SUCCESS)
             C4NDY_FATAL("Failed to create Vulkan graphics pipeline!");

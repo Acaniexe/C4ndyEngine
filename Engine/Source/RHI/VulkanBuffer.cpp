@@ -4,6 +4,9 @@
 
 namespace C4ndy::RHI
 {
+
+    VulkanBuffer::VulkanBuffer() = default;
+    
     void VulkanBuffer::Init(VulkanContext& context, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags memProps)
     {
         m_Context = &context;

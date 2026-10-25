@@ -14,7 +14,7 @@ namespace C4ndy::RHI
         void Shutdown();
         void Recreate(u32 width, u32 height);
         u32 AcquireNextImage(VkSemaphore imageAvailableSemaphore);
-        void Present(VkSemaphore renderFinishedSemaphore, u32 imageIndex);
+        bool Present(VkSemaphore renderFinishedSemaphore, u32 imageIndex);
 
         VkImageView GetImageView(u32 index) const { return m_ImageViews[index]; }
         VkFormat GetFormat() const { return m_ImageFormat; }

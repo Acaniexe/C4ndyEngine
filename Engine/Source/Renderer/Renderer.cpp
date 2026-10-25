@@ -1,12 +1,17 @@
 #include "Renderer.h"
 #include <Core/Logger.h>
+#include <windows.h>
 #include <array>
 #include <filesystem>
 
 namespace C4ndy::Renderer
 {
+
+    Renderer::Renderer() = default;
+
     void Renderer::Init(Window& window)
     {
+        m_Window = &window;
         m_Context.Init(window.GetNativeHandle());
 
         m_Swapchain.Init(m_Context, window.GetWidth(), window.GetHeight());
@@ -20,10 +25,17 @@ namespace C4ndy::Renderer
 
         CreateFrameBuffers();
 
-        LoadShaders("Engine/Shaders");
+        char exePath[MAX_PATH];
+        GetModuleFileNameA(nullptr, exePath, MAX_PATH);
+        std::string rootPath = std::filesystem::path(exePath)
+            .parent_path()
+            .parent_path()
+            .parent_path()
+            .string();
+        LoadShaders(rootPath + "/Engine/Shaders");
 
         m_Pipeline.Init(m_Context);
-        m_Pipeline.SetShaders(m_Shaders["triangle"].vert, m_Shaders["triangle"].frag);
+        m_Pipeline.SetShaders(*m_Shaders["triangle"].vert, *m_Shaders["triangle"].frag);
         m_Pipeline.SetRenderPass(m_RenderPass);
         m_Pipeline.SetExtent(m_Swapchain.GetExtent());
         m_Pipeline.Build();
@@ -41,8 +53,8 @@ namespace C4ndy::Renderer
         m_Pipeline.Shutdown();
         for (auto& [name, program] : m_Shaders)
         {
-            program.vert.Shutdown();
-            program.frag.Shutdown();
+            program.vert->Shutdown();
+            program.frag->Shutdown();
         }
         m_Shaders.clear();
         DestroyFrameBuffers();
@@ -79,8 +91,10 @@ namespace C4ndy::Renderer
             }
 
             ShaderProgram program;
-            program.vert.Init(m_Context, path, VK_SHADER_STAGE_VERTEX_BIT);
-            program.frag.Init(m_Context, fragPath, VK_SHADER_STAGE_FRAGMENT_BIT);
+            program.vert = MakeScope<RHI::VulkanShader>();
+            program.frag = MakeScope<RHI::VulkanShader>();
+            program.vert->Init(m_Context, path, VK_SHADER_STAGE_VERTEX_BIT);
+            program.frag->Init(m_Context, fragPath, VK_SHADER_STAGE_FRAGMENT_BIT);
             m_Shaders.emplace(name, std::move(program));
 
             C4NDY_INFO("Loaded shader pair: " + name);
@@ -129,7 +143,10 @@ namespace C4ndy::Renderer
 
         if (m_CurrentImageIndex == UINT32_MAX)
         {
-            OnResize(m_Swapchain.GetExtent().width, m_Swapchain.GetExtent().height);
+            if (m_Window)
+            {
+                OnResize(m_Window->GetWidth(), m_Window->GetHeight());
+            }
             return false;
         }
 
@@ -140,6 +157,20 @@ namespace C4ndy::Renderer
 
         m_Pipeline.Bind(m_CommandBuffer.GetCommandBuffer());
 
+        VkViewport viewPort{};
+        viewPort.x = 0.0f;
+        viewPort.y = 0.0f;
+        viewPort.width = (f32)m_Swapchain.GetExtent().width;
+        viewPort.height = (f32)m_Swapchain.GetExtent().height;
+        viewPort.minDepth = 0.0f;
+        viewPort.maxDepth = 1.0f;
+        vkCmdSetViewport(m_CommandBuffer.GetCommandBuffer(), 0, 1, &viewPort);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = m_Swapchain.GetExtent();
+        vkCmdSetScissor(m_CommandBuffer.GetCommandBuffer(), 0, 1, &scissor);
+
         return true;
     }
 
@@ -148,16 +179,32 @@ namespace C4ndy::Renderer
         m_RenderPass.End(m_CommandBuffer.GetCommandBuffer());
         m_CommandBuffer.End();
         m_CommandBuffer.Submit();
-        m_Swapchain.Present(m_CommandBuffer.GetRenderFinishedSemaphore(), m_CurrentImageIndex);
+        
+        if (m_Swapchain.Present(m_CommandBuffer.GetRenderFinishedSemaphore(), m_CurrentImageIndex))
+        {
+            if (m_Window)
+            {
+                OnResize(m_Window->GetWidth(), m_Window->GetHeight());
+            }
+        }
     }
 
     void Renderer::OnResize(u32 width, u32 height)
     {
+        if (width == 0 || height == 0)
+            return;
+        
         vkDeviceWaitIdle(m_Context.GetDevice());
         DestroyFrameBuffers();
         m_Swapchain.Recreate(width, height);
+
+        const VkExtent2D extent = m_Swapchain.GetExtent();
+
         m_DepthImage.Shutdown();
-        m_DepthImage.Init(m_Context, width, height, VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+        m_DepthImage.Init(m_Context, extent.width, extent.height, VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
         CreateFrameBuffers();
+
+        C4NDY_INFO("Renderer resized to " + std::to_string(extent.width) + "x" + std::to_string(extent.height));
     }
 }

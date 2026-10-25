@@ -17,6 +17,9 @@ namespace C4ndy
         void OnEvent(Event& e);
         void Close();
 
+        static void SetExecutablePath(const char* path);
+        static std::string s_ExecutablePath;
+
     private:
         bool OnWindowClose(WindowCloseEvent& e);
         Scope<Window> m_Window;

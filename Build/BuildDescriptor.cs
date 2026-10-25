@@ -55,4 +55,10 @@ public class ModuleDescriptor
 
     [JsonPropertyName("defines")]
     public List<string> Defines { get; set; } = new();
+
+    [JsonPropertyName("libs")]
+    public List<string> Libs { get; set; } = new();
+
+    [JsonPropertyName("lib_dirs")]
+    public List<string> LibDirs { get; set; } = new();
 }

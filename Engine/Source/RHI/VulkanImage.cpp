@@ -3,6 +3,8 @@
 
 namespace C4ndy::RHI
 {
+    VulkanImage::VulkanImage() = default;
+    
     void VulkanImage::Init(VulkanContext& context, u32 width, u32 height, VkFormat format, VkImageUsageFlags usage, VkImageAspectFlags aspectFlags)
     {
         m_Context = &context;

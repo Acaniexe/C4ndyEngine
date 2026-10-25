@@ -4,6 +4,8 @@
 
 namespace C4ndy::RHI
 {
+    VulkanShader::VulkanShader() = default;
+
     void VulkanShader::Init(VulkanContext& context, const std::string& path, VkShaderStageFlagBits stage)
     {
         m_Context = &context;
