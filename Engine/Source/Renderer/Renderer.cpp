@@ -1,8 +1,15 @@
 #include "Renderer.h"
 #include <Core/Logger.h>
-#include <windows.h>
 #include <array>
 #include <filesystem>
+#include <string>
+
+#if defined(_WIN32)
+    #include <windows.h>
+#elif defined(__linux__)
+    #include <unistd.h>
+    #include <limits.h>
+#endif
 
 namespace C4ndy::Renderer
 {
@@ -25,14 +32,41 @@ namespace C4ndy::Renderer
 
         CreateFrameBuffers();
 
-        char exePath[MAX_PATH];
-        GetModuleFileNameA(nullptr, exePath, MAX_PATH);
-        std::string rootPath = std::filesystem::path(exePath)
-            .parent_path()
-            .parent_path()
-            .parent_path()
-            .string();
-        LoadShaders(rootPath + "/Engine/Shaders");
+        std::filesystem::path rootPath;
+        #if defined(_WIN32)
+            char exePath[MAX_PATH];
+            GetModuleFileNameA(nullptr, exePath, MAX_PATH);
+
+            rootPath = std::filesystem::path(exePath)
+                .parent_path()
+                .parent_path()
+                .parent_path()
+                .string();
+
+        #elif defined(__linux__)
+            char exePath[PATH_MAX];
+            ssize_t pathLength = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+
+            if (pathLength == -1)
+            {
+                C4NDY_FATAL("Failed to retrieve executable path.");
+                return;
+            }
+
+            exePath[pathLength] = '\0';
+
+            rootPath = std::filesystem::path(exePath)
+                .parent_path()
+                .parent_path()
+                .parent_path()
+                .string();
+
+        #else
+            #error Unsupported platform
+
+        #endif
+
+        LoadShaders((rootPath / "Engine" / "Shaders").string());
 
         m_Pipeline.Init(m_Context);
         m_Pipeline.SetShaders(*m_Shaders["triangle"].vert, *m_Shaders["triangle"].frag);

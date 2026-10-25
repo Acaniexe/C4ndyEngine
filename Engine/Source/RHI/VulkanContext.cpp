@@ -1,5 +1,6 @@
 #include <Core/Core.h>
 #include "VulkanContext.h"
+#include <cstring>
 #include <Core/Logger.h>
 #include <set>
 #if defined(C4NDY_PLATFORM_WINDOWS)

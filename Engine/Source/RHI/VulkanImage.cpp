@@ -77,7 +77,7 @@ namespace C4ndy::RHI
         if (vkAllocateMemory(m_Context->GetDevice(), &allocInfo, nullptr, &m_Memory) != VK_SUCCESS)
             C4NDY_FATAL("Failed to allocate Vulkan image memory!");
         
-            vkBindImageMemory(m_Context->GetDevice(), m_Image, m_Memory, 0);
+        vkBindImageMemory(m_Context->GetDevice(), m_Image, m_Memory, 0);
     }
 
     void VulkanImage::CreateImageView(VkImageAspectFlags aspectFlags)
