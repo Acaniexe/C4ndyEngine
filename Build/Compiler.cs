@@ -148,6 +148,8 @@ public class Compiler
                 args.AddRange(objs.Select(o => $"\"{o}\""));
                 foreach (var dep in m.Dependencies)
                     if (libOutputs.TryGetValue(dep, out var lib)) args.Add($"\"{lib}\"");
+                foreach (var lib in m.Libs) args.Add($"-l{lib}");
+                foreach (var dir in m.LibDirs) args.Add($"-L\"{dir}\"");
                 args.AddRange(Platform.SystemLibs);
                 args.Add($"-o \"{outExe}\"");
                 return RunProcess(Platform.LD, string.Join(" ", args));

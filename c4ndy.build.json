@@ -82,6 +82,8 @@
       "include_dirs": ["Engine/Source", "Editor/Source", "Engine/ThirdParty/Vulkan/Include"],
       "lib_dirs": ["Engine/ThirdParty/Vulkan/Lib/Win"],
       "libs": ["vulkan-1.lib"],
+      "lib_dirs_linux": ["Engine/ThirdParty/Vulkan/Lib/Linux"],
+      "libs_linux": ["vulkan"],
       "dependencies": ["Core", "Math", "RHI", "Renderer", "Physics", "Audio", "Assets", "ECS"],
       "defines": ["C4NDY_EDITOR"]
     },
@@ -93,6 +95,8 @@
       "include_dirs": ["Engine/Source", "Engine/ThirdParty/Vulkan/Include"],
       "lib_dirs": ["Engine/ThirdParty/Vulkan/Lib/Win"],
       "libs": ["vulkan-1.lib"],
+      "lib_dirs_linux": ["Engine/ThirdParty/Vulkan/Lib/Linux"],
+      "libs_linux": ["vulkan"],
       "dependencies": ["Core", "Math", "RHI", "Renderer", "Physics", "Audio", "Assets", "ECS"],
       "defines": ["C4NDY_SANDBOX"]
     }

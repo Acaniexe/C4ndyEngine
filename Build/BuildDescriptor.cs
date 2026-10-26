@@ -61,4 +61,10 @@ public class ModuleDescriptor
 
     [JsonPropertyName("lib_dirs")]
     public List<string> LibDirs { get; set; } = new();
+
+    [JsonPropertyName("libs_linux")]
+    public List<string> LibsLinux { get; set; } = new();
+
+    [JsonPropertyName("lib_dirs_linux")]
+    public List<string> LibDirsLinux { get; set; } = new();
 }

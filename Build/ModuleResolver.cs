@@ -69,8 +69,9 @@ public class ModuleResolver
             IncludeDirs = includes,
             Dependencies = m.Dependencies,
             Defines = m.Defines,
-            Libs = m.Libs,
-            LibDirs = m.LibDirs.Select(d => Path.GetFullPath(Path.Combine(_root, d))).ToList(),
+            Libs = Platform.OS == HostPlatform.Windows ? m.Libs : m.LibsLinux,
+            LibDirs = (Platform.OS == HostPlatform.Windows ? m.LibDirs : m.LibDirsLinux)
+                .Select(d => Path.GetFullPath(Path.Combine(_root, d))).ToList(),
         };
     }
 }
