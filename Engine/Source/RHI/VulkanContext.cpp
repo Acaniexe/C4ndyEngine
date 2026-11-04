@@ -7,8 +7,8 @@
     #include <Windows.h>
     #include <vulkan/vulkan_win32.h>
 #elif defined(C4NDY_PLATFORM_LINUX)
-    #include <xcb/xcb.h>
-    #include <vulkan/vulkan_xcb.h>
+    #include <X11/X11.h>
+    #include <vulkan/vulkan_xlib.h>
 #endif
 
 namespace C4ndy::RHI
@@ -55,7 +55,7 @@ namespace C4ndy::RHI
     #if defined(C4NDY_PLATFORM_WINDOWS)
             "VK_KHR_win32_surface",
     #elif defined(C4NDY_PLATFORM_LINUX)
-            "VK_KHR_xcb_surface",
+            "VK_KHR_xlib_surface",
     #elif defined(C4NDY_PLATFORM_MACOS)
             "VK_MVK_macos_surface",
     #endif
@@ -163,12 +163,12 @@ namespace C4ndy::RHI
         struct LinuxWindowHandle { void* display; unsigned long window; };
         auto* handle = (LinuxWindowHandle*)windowHandle;
 
-        VkXcbSurfaceCreateInfoKHR createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-        createInfo.connection = (xcb_connection_t*)handle->display;
-        createInfo.window = (xcb_window_t)handle->window;
+        VkXlibSurfaceCreateInfoKHR createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+        createInfo.dpy = handle->display;
+        createInfo.window = handle->window;
 
-        if (vkCreateXcbSurfaceKHR(m_Instance, &createInfo, nullptr, &m_Surface) != VK_SUCCESS)
+        if (vkCreateXlibSurfaceKHR(m_Instance, &createInfo, nullptr, &m_Surface) != VK_SUCCESS)
             C4NDY_FATAL("Failed to create linux Vulkan Surface!");
     #endif
 
