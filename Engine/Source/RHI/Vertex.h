@@ -11,7 +11,7 @@ namespace C4ndy::RHI
     {
         Math::Vec3 position;
         Math::Vec3 normal;
-        Math::Vec3 uv;
+        Math::Vec2 uv;
     };
 
     inline VkVertexInputBindingDescription GetVertexBinding()

@@ -76,12 +76,79 @@ namespace C4ndy::Renderer
 
         m_CommandBuffer.Init(m_Context);
 
+        m_CameraBuffer.Init(m_Context, sizeof(CameraData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        m_CameraBuffer.Map();
+
+        m_CameraDescriptor.Init(m_Context);
+        m_CameraDescriptor.AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+        m_CameraDescriptor.Build();
+        m_CameraDescriptor.UpdateBuffer(0, m_CameraBuffer.GetBuffer(), sizeof(CameraData));
+
+        VkExtent2D ext = m_Swapchain.GetExtent();
+        SetCamera(Math::Mat4::LookAt(Math::Vec3(0.f, 0.f, 2.f), Math::Vec3(0.f), Math::Vec3(0.f, 1.f, 0.f)),
+                  Math::Mat4::Perspective(Math::ToRadians(60.f), (f32)ext.width / (f32)ext.height, 0.1f, 100.f));
+
+        m_MeshPipeline.Init(m_Context);
+        m_MeshPipeline.SetShaders(*m_Shaders["mesh"].vert, *m_Shaders["mesh"].frag);
+        m_MeshPipeline.SetRenderPass(m_RenderPass);
+        m_MeshPipeline.SetExtent(m_Swapchain.GetExtent());
+        m_MeshPipeline.SetUseVertexInput(true);
+        m_MeshPipeline.SetDescriptorLayout(m_CameraDescriptor.GetLayout());
+        m_MeshPipeline.SetPushConstantSize(sizeof(Math::Mat4));
+        m_MeshPipeline.Build();
+
+        const RHI::Vertex vertices[] = {
+            // +Z (front)
+            { {-0.5f,-0.5f, 0.5f}, { 0, 0, 1}, {0,0} }, { { 0.5f,-0.5f, 0.5f}, { 0, 0, 1}, {1,0} },
+            { { 0.5f, 0.5f, 0.5f}, { 0, 0, 1}, {1,1} }, { {-0.5f, 0.5f, 0.5f}, { 0, 0, 1}, {0,1} },
+            // -Z (back)
+            { { 0.5f,-0.5f,-0.5f}, { 0, 0,-1}, {0,0} }, { {-0.5f,-0.5f,-0.5f}, { 0, 0,-1}, {1,0} },
+            { {-0.5f, 0.5f,-0.5f}, { 0, 0,-1}, {1,1} }, { { 0.5f, 0.5f,-0.5f}, { 0, 0,-1}, {0,1} },
+            // +X (right)
+            { { 0.5f,-0.5f, 0.5f}, { 1, 0, 0}, {0,0} }, { { 0.5f,-0.5f,-0.5f}, { 1, 0, 0}, {1,0} },
+            { { 0.5f, 0.5f,-0.5f}, { 1, 0, 0}, {1,1} }, { { 0.5f, 0.5f, 0.5f}, { 1, 0, 0}, {0,1} },
+            // -X (left)
+            { {-0.5f,-0.5f,-0.5f}, {-1, 0, 0}, {0,0} }, { {-0.5f,-0.5f, 0.5f}, {-1, 0, 0}, {1,0} },
+            { {-0.5f, 0.5f, 0.5f}, {-1, 0, 0}, {1,1} }, { {-0.5f, 0.5f,-0.5f}, {-1, 0, 0}, {0,1} },
+            // +Y (top)
+            { {-0.5f, 0.5f, 0.5f}, { 0, 1, 0}, {0,0} }, { { 0.5f, 0.5f, 0.5f}, { 0, 1, 0}, {1,0} },
+            { { 0.5f, 0.5f,-0.5f}, { 0, 1, 0}, {1,1} }, { {-0.5f, 0.5f,-0.5f}, { 0, 1, 0}, {0,1} },
+            // -Y (bottom)
+            { {-0.5f,-0.5f,-0.5f}, { 0,-1, 0}, {0,0} }, { { 0.5f,-0.5f,-0.5f}, { 0,-1, 0}, {1,0} },
+            { { 0.5f,-0.5f, 0.5f}, { 0,-1, 0}, {1,1} }, { {-0.5f,-0.5f, 0.5f}, { 0,-1, 0}, {0,1} },
+        };
+
+        u32 indices[36];
+        for (u32 f = 0; f < 6; f++)
+        {
+            u32 b = f * 4;
+            u32* i = &indices[f * 6];
+            i[0] = b; i[1] = b + 1; i[2] = b + 2;
+            i[3] = b + 2; i[4] = b + 3; i[5] = b;
+        }
+
+
+        const VkMemoryPropertyFlags hostVisible = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+        m_QuadVertexBuffer.Init(m_Context, sizeof(vertices), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, hostVisible);
+        m_QuadVertexBuffer.Map();
+        m_QuadVertexBuffer.WriteData(vertices, sizeof(vertices));
+
+        m_QuadIndexBuffer.Init(m_Context, sizeof(indices), VK_BUFFER_USAGE_INDEX_BUFFER_BIT, hostVisible);
+        m_QuadIndexBuffer.Map();
+        m_QuadIndexBuffer.WriteData(indices, sizeof(indices));
+
         C4NDY_INFO("Renderer Initialised.");
     }
 
     void Renderer::Shutdown()
     {
         vkDeviceWaitIdle(m_Context.GetDevice());
+        m_QuadIndexBuffer.Shutdown();
+        m_QuadVertexBuffer.Shutdown();
+        m_MeshPipeline.Shutdown();
+        m_CameraDescriptor.Shutdown();
+        m_CameraBuffer.Shutdown();
 
         m_CommandBuffer.Shutdown();
         m_Pipeline.Shutdown();
@@ -240,5 +307,26 @@ namespace C4ndy::Renderer
         CreateFrameBuffers();
 
         C4NDY_INFO("Renderer resized to " + std::to_string(extent.width) + "x" + std::to_string(extent.height));
+    }
+
+    void Renderer::DrawTestQuad(const Math::Mat4& model)
+    {
+        VkCommandBuffer cmd = m_CommandBuffer.GetCommandBuffer();
+        m_MeshPipeline.Bind(cmd);
+        vkCmdPushConstants(cmd, m_MeshPipeline.GetLayout(), VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Math::Mat4), &model);
+        VkDescriptorSet set = m_CameraDescriptor.GetSet();
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_MeshPipeline.GetLayout(), 0, 1, &set, 0, nullptr);
+
+        VkBuffer vb = m_QuadVertexBuffer.GetBuffer();
+        VkDeviceSize offset = 0;
+        vkCmdBindVertexBuffers(cmd, 0, 1, &vb, &offset);
+        vkCmdBindIndexBuffer(cmd, m_QuadIndexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+        vkCmdDrawIndexed(cmd, 36, 1, 0, 0, 0);
+    }
+
+    void Renderer::SetCamera(const Math::Mat4& view, const Math::Mat4& projection)
+    {
+        CameraData data{ view, projection };
+        m_CameraBuffer.WriteData(&data, sizeof(data));
     }
 }

@@ -53,8 +53,8 @@ namespace C4ndy::Math
     inline f32 Atan2(f32 y, f32 x) { return std::atan2f(y, x); }
     inline void SinCos(f32 a, f32& s, f32& c) { s = std::sinf(a); c = std::cosf(a); }
 
-    inline bool NearlyEqual(f32 a, f32 b, f32 eps = EPSILON) { return Abs(a - b) <= eps; }
-    inline bool NearlyZero(f32 a, f32 eps = EPSILON) { return Abs(a) <= eps; }
+    inline constexpr bool NearlyEqual(f32 a, f32 b, f32 eps = EPSILON) { return Abs(a - b) <= eps; }
+    inline constexpr bool NearlyZero(f32 a, f32 eps = EPSILON) { return Abs(a) <= eps; }
 
     inline bool IsPowerOf2(u32 x) { return x != 0 && (x & (x - 1)) == 0; }
     inline u32 NextPowerOf2(u32 x) {

@@ -1,5 +1,6 @@
 #include "VulkanPipeline.h"
 #include <Core/Logger.h>
+#include "Vertex.h"
 
 namespace C4ndy::RHI
 {
@@ -46,8 +47,19 @@ namespace C4ndy::RHI
 
     void VulkanPipeline::Build()
     {
-        VkPipelineVertexInputStateCreateInfo vertexInfo{};
-        vertexInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        auto binding = GetVertexBinding();
+        auto attributes = GetVertexAttributes();
+
+        VkPipelineVertexInputStateCreateInfo vertexInput{};
+        vertexInput.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+        if (m_UseVertexInput)
+        {
+            vertexInput.vertexBindingDescriptionCount = 1;
+            vertexInput.pVertexBindingDescriptions = &binding;
+            vertexInput.vertexAttributeDescriptionCount = (u32)attributes.size();
+            vertexInput.pVertexAttributeDescriptions = attributes.data();
+        }
         
         std::array<VkDynamicState, 2> dynamicStates = {
             VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR
@@ -84,8 +96,8 @@ namespace C4ndy::RHI
         VkPipelineRasterizationStateCreateInfo rasterizer{};
         rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-        //rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-        rasterizer.cullMode = VK_CULL_MODE_NONE;
+        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+        //rasterizer.cullMode = VK_CULL_MODE_NONE;
         rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.lineWidth = 1.0f;
 
@@ -112,10 +124,17 @@ namespace C4ndy::RHI
         colorBlending.attachmentCount = 1;
         colorBlending.pAttachments = &colorBlendAttachment;
 
+        VkPushConstantRange pushRange{};
+        pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        pushRange.offset = 0;
+        pushRange.size = m_PushConstantSize;
+
         VkPipelineLayoutCreateInfo layoutInfo{};
         layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         layoutInfo.setLayoutCount = m_DescriptorLayout != VK_NULL_HANDLE ? 1 : 0;
         layoutInfo.pSetLayouts = m_DescriptorLayout != VK_NULL_HANDLE ? &m_DescriptorLayout : nullptr;
+        layoutInfo.pushConstantRangeCount = m_PushConstantSize > 0 ? 1 : 0;
+        layoutInfo.pPushConstantRanges = m_PushConstantSize > 0 ? &pushRange : nullptr;
 
         if (vkCreatePipelineLayout(m_Context->GetDevice(), &layoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
             C4NDY_FATAL("Failed to create pipeline layout!");
@@ -124,7 +143,7 @@ namespace C4ndy::RHI
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipelineInfo.stageCount = 2;
         pipelineInfo.pStages = m_ShaderStages;
-        pipelineInfo.pVertexInputState = &vertexInfo;
+        pipelineInfo.pVertexInputState = &vertexInput;
         pipelineInfo.pInputAssemblyState = &inputAssembly;
         pipelineInfo.pViewportState = &viewportState;
         pipelineInfo.pRasterizationState = &rasterizer;

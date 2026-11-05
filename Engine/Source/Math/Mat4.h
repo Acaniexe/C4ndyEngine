@@ -100,12 +100,12 @@ namespace C4ndy::Math
         static Mat4 Perspective(f32 fov, f32 aspect, f32 near, f32 far)
         {
             f32 tanHalf = Tan(fov * 0.5f);
-            Mat4 m = {};
+            Mat4 m(Vec4(0.f), Vec4(0.f), Vec4(0.f), Vec4(0.f));
             m.col[0].x = 1.f / (aspect * tanHalf);
-            m.col[1].y = 1.f / tanHalf;
-            m.col[2].z = -(far + near) / (far - near);
+            m.col[1].y = -1.f / tanHalf;
+            m.col[2].z = far / (near - far);
             m.col[2].w = -1.f;
-            m.col[3].z = -(2.f * far * near) / (far - near);
+            m.col[3].z = -(far * near) / (far - near);
             return m;
         }
 

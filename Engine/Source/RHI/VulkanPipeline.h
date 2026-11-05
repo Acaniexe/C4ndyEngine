@@ -19,9 +19,11 @@ namespace C4ndy::RHI
         void SetRenderPass(VulkanRenderPass&);
         void SetDescriptorLayout(VkDescriptorSetLayout);
         void SetExtent(VkExtent2D);
+        void SetPushConstantSize(u32 size) { m_PushConstantSize = size; }
 
         void Build();
         void Bind(VkCommandBuffer);
+        void SetUseVertexInput(bool use) { m_UseVertexInput = use; }
         VkPipelineLayout GetLayout() const { return m_PipelineLayout; }
 
     private:
@@ -32,5 +34,7 @@ namespace C4ndy::RHI
         VkRenderPass m_RenderPass = VK_NULL_HANDLE;
         VkDescriptorSetLayout m_DescriptorLayout = VK_NULL_HANDLE;
         VkExtent2D m_Extent{};
+        bool m_UseVertexInput = false;
+        u32 m_PushConstantSize = 0;
     };
 }

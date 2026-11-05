@@ -2,6 +2,7 @@
 #include <Core/Core.h>
 #include <Core/Window.h>
 #include <RHI/RHI.h>
+#include <Math/Math.h>
 
 namespace C4ndy::Renderer
 {
@@ -19,6 +20,14 @@ namespace C4ndy::Renderer
         void OnResize(u32 width, u32 height);
 
         VkCommandBuffer GetCommandBuffer() const { return m_CommandBuffer.GetCommandBuffer(); }
+        void DrawTestQuad(const Math::Mat4& model);
+
+        struct CameraData
+        {
+            Math::Mat4 view;
+            Math::Mat4 projection;
+        };
+        void SetCamera(const Math::Mat4& view, const Math::Mat4& projection);
 
     private:
         Window* m_Window = nullptr;
@@ -31,6 +40,11 @@ namespace C4ndy::Renderer
         RHI::VulkanImage m_DepthImage;
         std::vector<VkFramebuffer> m_Framebuffers;
         u32 m_CurrentImageIndex = 0;
+        RHI::VulkanPipeline m_MeshPipeline;
+        RHI::VulkanBuffer m_QuadVertexBuffer;
+        RHI::VulkanBuffer m_QuadIndexBuffer;
+        RHI::VulkanBuffer m_CameraBuffer;
+        RHI::VulkanDescriptor m_CameraDescriptor;
 
         struct ShaderProgram
         {

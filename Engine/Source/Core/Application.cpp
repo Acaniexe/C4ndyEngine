@@ -45,7 +45,9 @@ namespace C4ndy
 
             if (m_Renderer.BeginFrame())
             {
-                vkCmdDraw(m_Renderer.GetCommandBuffer(), 3, 1, 0, 0);
+               // vkCmdDraw(m_Renderer.GetCommandBuffer(), 3, 1, 0, 0);
+                Math::Mat4 model = Math::Mat4::RotationY(m_Timer.ElapsedTime()) * Math::Mat4::RotationX(m_Timer.ElapsedTime() * 0.5f);
+                m_Renderer.DrawTestQuad(model);
                 m_Renderer.EndFrame();
             }
 
