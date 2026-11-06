@@ -41,18 +41,42 @@ namespace C4ndy
         {
             m_Timer.Tick();
             m_Window->OnUpdate();
-            Input::Update();
+
+            f32 dt = (f32)m_Timer.DeltaTime();
+
+            if (Input::IsMouseButtonDown(Mouse::Right))
+            {
+                const f32 sens = 0.003f;
+                m_Camera.Rotate(Input::GetMouseDeltaX() * sens, -Input::GetMouseDeltaY() * sens);
+            }
+
+            const f32 speed = 3.0f * dt;
+            Math::Vec3 fwd = m_Camera.GetForward();
+            Math::Vec3 right = m_Camera.GetRight();
+            if (Input::IsKeyDown(Key::W)) m_Camera.Move(fwd * speed);
+            if (Input::IsKeyDown(Key::S)) m_Camera.Move(fwd * -speed);
+            if (Input::IsKeyDown(Key::D)) m_Camera.Move(right * speed);
+            if (Input::IsKeyDown(Key::A)) m_Camera.Move(right * -speed);
+            if (Input::IsKeyDown(Key::E)) m_Camera.Move(Math::Vec3(0.f, speed, 0.f));
+            if (Input::IsKeyDown(Key::Q)) m_Camera.Move(Math::Vec3(0.f, -speed, 0.f));
+
+            if (m_Window->GetHeight() > 0)
+                m_Camera.SetAspect((f32)m_Window->GetWidth() / (f32)m_Window->GetHeight());
 
             if (m_Renderer.BeginFrame())
             {
                // vkCmdDraw(m_Renderer.GetCommandBuffer(), 3, 1, 0, 0);
-                Math::Mat4 model = Math::Mat4::RotationY(m_Timer.ElapsedTime()) * Math::Mat4::RotationX(m_Timer.ElapsedTime() * 0.5f);
+                f32 t = (f32)m_Timer.ElapsedTime();
+                Math::Mat4 model = Math::Mat4::RotationY(t) * Math::Mat4::RotationX(t * 0.5f);
+                m_Renderer.SetCamera(m_Camera.GetView(), m_Camera.GetProjection());
                 m_Renderer.DrawTestQuad(model);
                 m_Renderer.EndFrame();
             }
 
             if (m_Window->ShouldClose())
                 m_Running = false;
+
+            Input::Update();
         }
     }
 
