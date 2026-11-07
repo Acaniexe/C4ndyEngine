@@ -165,7 +165,7 @@ namespace C4ndy::RHI
 
         VkXlibSurfaceCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-        createInfo.dpy = (window*)handle->display;
+        createInfo.dpy = (Display*)handle->display;
         createInfo.window = handle->window;
 
         if (vkCreateXlibSurfaceKHR(m_Instance, &createInfo, nullptr, &m_Surface) != VK_SUCCESS)
