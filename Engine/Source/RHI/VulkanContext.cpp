@@ -7,7 +7,7 @@
     #include <Windows.h>
     #include <vulkan/vulkan_win32.h>
 #elif defined(C4NDY_PLATFORM_LINUX)
-    #include <X11/X11.h>
+    #include <X11/Xlib.h>
     #include <vulkan/vulkan_xlib.h>
 #endif
 
@@ -165,7 +165,7 @@ namespace C4ndy::RHI
 
         VkXlibSurfaceCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-        createInfo.dpy = handle->display;
+        createInfo.dpy = (window*)handle->display;
         createInfo.window = handle->window;
 
         if (vkCreateXlibSurfaceKHR(m_Instance, &createInfo, nullptr, &m_Surface) != VK_SUCCESS)

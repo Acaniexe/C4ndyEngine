@@ -1,7 +1,7 @@
 #pragma once
 #include <Core/Core.h>
 #include <Math/Math.h>
-#include <Vulkan/vulkan.h>
+#include <vulkan/vulkan.h>
 #include <array>
 #include <cstddef>
 
