@@ -146,15 +146,15 @@ public class Compiler
             {
                 args.AddRange(Platform.CompileFlags);
                 args.AddRange(objs.Select(o => $"\"{o}\""));
-                args.Add("-Wl, --start-group");
+                args.Add("-Wl,--start-group");
                 foreach (var dep in m.Dependencies)
                     if (libOutputs.TryGetValue(dep, out var lib)) args.Add($"\"{lib}\"");
-                args.Add("-Wl, --end-group");
+                args.Add("-Wl,--end-group");
                 foreach (var lib in m.Libs) args.Add($"-l{lib}");
                 foreach (var dir in m.LibDirs)
                 { 
                     args.Add($"-L\"{dir}\"");
-                    args.Add($"-Wl, -rpath,\"{dir}\"");
+                    args.Add($"-Wl,-rpath,\"{dir}\"");
                 }
                 args.AddRange(Platform.SystemLibs);
                 args.Add($"-o \"{outExe}\"");
