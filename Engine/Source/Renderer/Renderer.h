@@ -26,8 +26,16 @@ namespace C4ndy::Renderer
         {
             Math::Mat4 view;
             Math::Mat4 projection;
+            Math::Vec4 lightPos;
         };
         void SetCamera(const Math::Mat4& view, const Math::Mat4& projection);
+
+        struct PushData
+        {
+            Math::Mat4 model;
+            Math::Vec4 params;
+        };
+        void DrawLightMarker();
 
     private:
         Window* m_Window = nullptr;
@@ -46,6 +54,8 @@ namespace C4ndy::Renderer
         RHI::VulkanBuffer m_CameraBuffer;
         RHI::VulkanDescriptor m_CameraDescriptor;
 
+        Math::Vec4 m_LightPos = Math::Vec4(1.0f, 1.0f, 1.5f, 0.f);
+
         struct ShaderProgram
         {
             Scope<RHI::VulkanShader> vert;
@@ -57,5 +67,6 @@ namespace C4ndy::Renderer
         void LoadShaders(const std::string& shaderDir);
         void CreateFrameBuffers();
         void DestroyFrameBuffers();
+        void DrawCube(const PushData& push);
     };
 }

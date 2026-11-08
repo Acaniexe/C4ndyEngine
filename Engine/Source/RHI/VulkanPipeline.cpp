@@ -125,7 +125,7 @@ namespace C4ndy::RHI
         colorBlending.pAttachments = &colorBlendAttachment;
 
         VkPushConstantRange pushRange{};
-        pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
         pushRange.offset = 0;
         pushRange.size = m_PushConstantSize;
 

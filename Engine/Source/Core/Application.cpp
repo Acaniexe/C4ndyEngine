@@ -70,6 +70,7 @@ namespace C4ndy
                 Math::Mat4 model = Math::Mat4::RotationY(t) * Math::Mat4::RotationX(t * 0.5f);
                 m_Renderer.SetCamera(m_Camera.GetView(), m_Camera.GetProjection());
                 m_Renderer.DrawTestCube(model);
+                m_Renderer.DrawLightMarker();
                 m_Renderer.EndFrame();
             }
 

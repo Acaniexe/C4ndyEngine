@@ -80,7 +80,7 @@ namespace C4ndy::Renderer
         m_CameraBuffer.Map();
 
         m_CameraDescriptor.Init(m_Context);
-        m_CameraDescriptor.AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+        m_CameraDescriptor.AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
         m_CameraDescriptor.Build();
         m_CameraDescriptor.UpdateBuffer(0, m_CameraBuffer.GetBuffer(), sizeof(CameraData));
 
@@ -94,7 +94,7 @@ namespace C4ndy::Renderer
         m_MeshPipeline.SetExtent(m_Swapchain.GetExtent());
         m_MeshPipeline.SetUseVertexInput(true);
         m_MeshPipeline.SetDescriptorLayout(m_CameraDescriptor.GetLayout());
-        m_MeshPipeline.SetPushConstantSize(sizeof(Math::Mat4));
+        m_MeshPipeline.SetPushConstantSize(sizeof(PushData));
         m_MeshPipeline.Build();
 
         const RHI::Vertex vertices[] = {
@@ -301,7 +301,7 @@ namespace C4ndy::Renderer
         C4NDY_INFO("Renderer resized to " + std::to_string(extent.width) + "x" + std::to_string(extent.height));
     }
 
-    void Renderer::DrawTestCube(const Math::Mat4& model)
+    /*void Renderer::DrawTestCube(const Math::Mat4& model)
     {
         VkCommandBuffer cmd = m_CommandBuffer.GetCommandBuffer();
         m_MeshPipeline.Bind(cmd);
@@ -314,11 +314,40 @@ namespace C4ndy::Renderer
         vkCmdBindVertexBuffers(cmd, 0, 1, &vb, &offset);
         vkCmdBindIndexBuffer(cmd, m_CubeIndexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
         vkCmdDrawIndexed(cmd, 36, 1, 0, 0, 0);
+    }*/
+
+    void Renderer::DrawCube(const PushData& push)
+    {
+        VkCommandBuffer cmd = m_CommandBuffer.GetCommandBuffer();
+        m_MeshPipeline.Bind(cmd);
+
+        VkDescriptorSet set = m_CameraDescriptor.GetSet();
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_MeshPipeline.GetLayout(), 0, 1, &set, 0, nullptr);
+
+        vkCmdPushConstants(cmd, m_MeshPipeline.GetLayout(), VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PushData), &push);
+
+        VkBuffer vb = m_CubeVertexBuffer.GetBuffer();
+        VkDeviceSize offset = 0;
+        vkCmdBindVertexBuffers(cmd, 0, 1, &vb, &offset);
+        vkCmdBindIndexBuffer(cmd, m_CubeIndexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+        vkCmdDrawIndexed(cmd, 36, 1, 0, 0, 0);
+    }
+
+    void Renderer::DrawTestCube(const Math::Mat4& model)
+    {
+        DrawCube({ model, Math::Vec4(0.f) });
+    }
+
+    void Renderer::DrawLightMarker()
+    {
+        Math::Mat4 model = Math::Mat4::Translation(Math::Vec3(m_LightPos.x, m_LightPos.y, m_LightPos.z)) *
+                           Math::Mat4::Scale(Math::Vec3(0.1f));
+        DrawCube({ model, Math::Vec4(1.f, 0.9f, 0.4f, 1.f) });
     }
 
     void Renderer::SetCamera(const Math::Mat4& view, const Math::Mat4& projection)
     {
-        CameraData data{ view, projection };
+        CameraData data{ view, projection, m_LightPos };
         m_CameraBuffer.WriteData(&data, sizeof(data));
     }
 }
