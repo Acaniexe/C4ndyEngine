@@ -127,16 +127,8 @@ namespace C4ndy::Renderer
             i[3] = b + 2; i[4] = b + 3; i[5] = b;
         }
 
-
-        const VkMemoryPropertyFlags hostVisible = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-
-        m_QuadVertexBuffer.Init(m_Context, sizeof(vertices), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, hostVisible);
-        m_QuadVertexBuffer.Map();
-        m_QuadVertexBuffer.WriteData(vertices, sizeof(vertices));
-
-        m_QuadIndexBuffer.Init(m_Context, sizeof(indices), VK_BUFFER_USAGE_INDEX_BUFFER_BIT, hostVisible);
-        m_QuadIndexBuffer.Map();
-        m_QuadIndexBuffer.WriteData(indices, sizeof(indices));
+        m_CubeVertexBuffer.InitDeviceLocal(m_Context, vertices, sizeof(vertices), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+        m_CubeIndexBuffer.InitDeviceLocal(m_Context, indices, sizeof(indices), VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 
         C4NDY_INFO("Renderer Initialised.");
     }
@@ -144,8 +136,8 @@ namespace C4ndy::Renderer
     void Renderer::Shutdown()
     {
         vkDeviceWaitIdle(m_Context.GetDevice());
-        m_QuadIndexBuffer.Shutdown();
-        m_QuadVertexBuffer.Shutdown();
+        m_CubeIndexBuffer.Shutdown();
+        m_CubeVertexBuffer.Shutdown();
         m_MeshPipeline.Shutdown();
         m_CameraDescriptor.Shutdown();
         m_CameraBuffer.Shutdown();
@@ -309,7 +301,7 @@ namespace C4ndy::Renderer
         C4NDY_INFO("Renderer resized to " + std::to_string(extent.width) + "x" + std::to_string(extent.height));
     }
 
-    void Renderer::DrawTestQuad(const Math::Mat4& model)
+    void Renderer::DrawTestCube(const Math::Mat4& model)
     {
         VkCommandBuffer cmd = m_CommandBuffer.GetCommandBuffer();
         m_MeshPipeline.Bind(cmd);
@@ -317,10 +309,10 @@ namespace C4ndy::Renderer
         VkDescriptorSet set = m_CameraDescriptor.GetSet();
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_MeshPipeline.GetLayout(), 0, 1, &set, 0, nullptr);
 
-        VkBuffer vb = m_QuadVertexBuffer.GetBuffer();
+        VkBuffer vb = m_CubeVertexBuffer.GetBuffer();
         VkDeviceSize offset = 0;
         vkCmdBindVertexBuffers(cmd, 0, 1, &vb, &offset);
-        vkCmdBindIndexBuffer(cmd, m_QuadIndexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
+        vkCmdBindIndexBuffer(cmd, m_CubeIndexBuffer.GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
         vkCmdDrawIndexed(cmd, 36, 1, 0, 0, 0);
     }
 

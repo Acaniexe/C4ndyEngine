@@ -20,7 +20,7 @@ namespace C4ndy::Renderer
         void OnResize(u32 width, u32 height);
 
         VkCommandBuffer GetCommandBuffer() const { return m_CommandBuffer.GetCommandBuffer(); }
-        void DrawTestQuad(const Math::Mat4& model);
+        void DrawTestCube(const Math::Mat4& model);
 
         struct CameraData
         {
@@ -41,8 +41,8 @@ namespace C4ndy::Renderer
         std::vector<VkFramebuffer> m_Framebuffers;
         u32 m_CurrentImageIndex = 0;
         RHI::VulkanPipeline m_MeshPipeline;
-        RHI::VulkanBuffer m_QuadVertexBuffer;
-        RHI::VulkanBuffer m_QuadIndexBuffer;
+        RHI::VulkanBuffer m_CubeVertexBuffer;
+        RHI::VulkanBuffer m_CubeIndexBuffer;
         RHI::VulkanBuffer m_CameraBuffer;
         RHI::VulkanDescriptor m_CameraDescriptor;
 

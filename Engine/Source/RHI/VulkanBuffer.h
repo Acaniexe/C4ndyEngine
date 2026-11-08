@@ -12,6 +12,7 @@ namespace C4ndy::RHI
         C4NDY_NON_COPYABLE_MOVEABLE(VulkanBuffer);
 
         void Init(VulkanContext&, VkDeviceSize size, VkBufferUsageFlags, VkMemoryPropertyFlags);
+        void InitDeviceLocal(VulkanContext& context, const void* data, VkDeviceSize size, VkBufferUsageFlags usage);
         void Shutdown();
 
         void Map();

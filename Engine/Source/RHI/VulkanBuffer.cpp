@@ -84,4 +84,52 @@ namespace C4ndy::RHI
         }
         memcpy(m_MappedData, data, (size_t)size);
     }
+
+    void VulkanBuffer::InitDeviceLocal(VulkanContext& context, const void* data, VkDeviceSize size, VkBufferUsageFlags usage)
+    {
+        VulkanBuffer staging;
+        staging.Init(context, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        staging.Map();
+        staging.WriteData(data, size);
+
+        Init(context, size, usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+        VkDevice device = context.GetDevice();
+
+        VkCommandPoolCreateInfo poolInfo{};
+        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        poolInfo.queueFamilyIndex = context.GetGraphicsQueueFamily();
+        poolInfo.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
+        VkCommandPool pool = VK_NULL_HANDLE;
+        vkCreateCommandPool(device, &poolInfo, nullptr, &pool);
+
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = pool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = 1;
+        VkCommandBuffer cmd = VK_NULL_HANDLE;
+        vkAllocateCommandBuffers(device, &allocInfo, &cmd);
+
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+        vkBeginCommandBuffer(cmd, &beginInfo);
+
+        VkBufferCopy region{};
+        region.size = size;
+        vkCmdCopyBuffer(cmd, staging.GetBuffer(), m_Buffer, 1, &region);
+
+        vkEndCommandBuffer(cmd);
+
+        VkSubmitInfo submit{};
+        submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit.commandBufferCount = 1;
+        submit.pCommandBuffers = &cmd;
+        vkQueueSubmit(context.GetGraphicsQueue(), 1, &submit, VK_NULL_HANDLE);
+        vkQueueWaitIdle(context.GetGraphicsQueue());
+
+        vkDestroyCommandPool(device, pool, nullptr);
+        staging.Shutdown();
+    }
 }
