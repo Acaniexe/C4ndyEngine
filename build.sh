@@ -32,13 +32,8 @@ fi
 TOOL="./Build/bin/${RID}/C4ndyBuildTool"
 
 if [ ! -f "$TOOL" ]; then
-    echo "[C4ndy] Build tool not found. Building it first..."
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 dotnet publish ./Build/C4ndyBuildTool.csproj \
-        -c Release -r "$RID" --self-contained \
-        -p:PublishSingleFile=true \
-        -p:InvariantGlobalization=true \
-        -o "./Build/bin/${RID}" > /dev/null
-    chmod +x "$TOOL"
+    echo "[C4ndy] Build tool not found. Run ./setup.sh first."
+    exit 1
 fi
 
 "$TOOL" "$TARGET" "$CONFIG"

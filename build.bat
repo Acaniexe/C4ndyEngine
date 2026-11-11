@@ -49,13 +49,8 @@ if /i "%TARGET%"=="buildtool" (
 set TOOL=.\Build\bin\win-x64\C4ndyBuildTool.exe
 
 if not exist "%TOOL%" (
-    echo [C4ndy] Build tool not found. Building it first...
-    dotnet publish .\Build\C4ndyBuildTool.csproj -c Release -r win-x64 --self-contained ^
-        -p:PublishSingleFile=true -o .\Build\bin\win-x64 > nul
-    if errorlevel 1 (
-        echo [C4ndy] Failed to build C4ndyBuildTool.
-        exit /b 1
-    )
+    ech0 [C4ndy] Build tool not found. Run setup.bat first.
+    exit /b 1
 )
 
 "%TOOL%" %TARGET% %CONFIG%
