@@ -35,6 +35,9 @@ class Program
         Console.WriteLine($"   Platform : {Platform.Description()}");
         Console.WriteLine();
 
+        if (args.Length > 0 && (args[0] == "setup" || args[0] == "verify"))
+            return DependencySetup.Run(root, verifyOnly: args[0] == "verify") ? 0 : 1;
+
         BuildDescriptor? descriptor = BuildDescriptor.Load(Path.Combine(root, "c4ndy.build.json"));
         if (descriptor is null)
         {

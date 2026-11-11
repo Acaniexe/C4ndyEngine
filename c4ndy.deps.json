@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "release_base": "https://github.com/Acaniexe/C4ndyEngine/releases/download/deps-vulkan-1.4.363.0/",
+  "dependencies": [
+    { "name": "vulkan-headers", "platform": "all", "file": "vulkan-headers.zip",
+      "sha256": "C0DBCE52B92995DC7B3A679AE0EAFAD76DAB006699134E5805EB2DF8F92EDDC8",
+      "extract_to": "Engine/ThirdParty/Vulkan/Include", "check": "vulkan/vulkan.h" },
+
+    { "name": "vulkan-loader-win", "platform": "windows", "file": "vulkan-loader-win.zip",
+      "sha256": "86FBA1EEBC65A2956B871C6CFD1AE5DA51D22F0B7966B08141FB59989DBD3CF7",
+      "extract_to": "Engine/ThirdParty/Vulkan/Lib/Win", "check": "vulkan-1.lib" },
+
+    { "name": "glslc-win", "platform": "windows", "file": "glslc-win.zip",
+      "sha256": "C1D67FCF12F182CDF32A8CCB2525CB96E289662CED28F8E2576DF924DAEB2038",
+      "extract_to": "Engine/ThirdParty/Vulkan/Bin/Win", "check": "glslc.exe" },
+
+    { "name": "validation-win", "platform": "windows", "file": "validation-win.zip",
+      "sha256": "5045A993B2BF6A552F554ED4E5E44E2D5F0140C5CD1F79991175E05F1B5C9AE9",
+      "extract_to": "Engine/ThirdParty/Vulkan/Layers/Win", "check": "VkLayer_khronos_validation.dll" },
+
+    { "name": "vulkan-loader-linux", "platform": "linux", "file": "vulkan-loader-linux.tar.gz",
+      "sha256": "69f837353f0b1867aff04b1b50dccadbf515aec77acae27cff14b057e8c12b95",
+      "extract_to": "Engine/ThirdParty/Vulkan/Lib/Linux/VulkanLoader/lib", "check": "libvulkan.so.1.4.363" },
+
+    { "name": "glslc-linux", "platform": "linux", "file": "glslc-linux.tar.gz",
+      "sha256": "e3631feecbf0f84bf647351d4976039a42bfce586635c4c40dceb39c76bd2482",
+      "extract_to": "Engine/ThirdParty/Vulkan/Bin/Linux", "check": "glslc", "executable": true },
+
+    { "name": "validation-linux", "platform": "linux", "file": "validation-linux.tar.gz",
+      "sha256": "87c2c4c0cd52b723d94d6e588efd92815eff4256b2c985e1721c2874ede82ec3",
+      "extract_to": "Engine/ThirdParty/Vulkan/Layers/Linux", "check": "libVkLayer_khronos_validation.so" },
+
+    { "name": "vulkan-licenses", "platform": "all", "file": "licenses.zip",
+      "sha256": "EA2E4500A1799D351208CA64985B2A4F1A3DF04771340757376F34AF268EB3CB",
+      "extract_to": "Engine/ThirdParty/Vulkan/Licenses" }
+  ]
+}

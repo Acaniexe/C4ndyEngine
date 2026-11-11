@@ -6,7 +6,7 @@ Build/obj/
 C4ndyEngine-Notes.md
 
 # Third Party
-Engine/ThirdParty/Vulkan/
+Engine/ThirdParty/
 
 # Object / Library Files
 *.obj
