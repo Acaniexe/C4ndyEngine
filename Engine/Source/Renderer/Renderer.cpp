@@ -18,19 +18,11 @@ namespace C4ndy::Renderer
 
     void Renderer::Init(Window& window)
     {
-        m_Window = &window;
-        m_Context.Init(window.GetNativeHandle());
-
-        m_Swapchain.Init(m_Context, window.GetWidth(), window.GetHeight());
-
-        m_DepthImage.Init(
-            m_Context, window.GetWidth(), window.GetHeight(),
-            VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT
-        );
-
-        m_RenderPass.Init(m_Context, m_Swapchain.GetFormat(), VK_FORMAT_D32_SFLOAT);
-
-        CreateFrameBuffers();
+        #if defined(C4NDY_PLATFORM_WINDOWS)
+            const char* layerOS = "Win";
+        #else
+            const char* layerOS = "Linux";
+        #endif
 
         std::filesystem::path rootPath;
         #if defined(_WIN32)
@@ -65,6 +57,21 @@ namespace C4ndy::Renderer
             #error Unsupported platform
 
         #endif
+        
+        m_Context.SetLayerPath((std::filesystem::path(rootPath) / "Engine" / "ThirdParty" / "Vulkan" / "Layers" / layerOS).string());
+        m_Window = &window;
+        m_Context.Init(window.GetNativeHandle());
+
+        m_Swapchain.Init(m_Context, window.GetWidth(), window.GetHeight());
+
+        m_DepthImage.Init(
+            m_Context, window.GetWidth(), window.GetHeight(),
+            VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT
+        );
+
+        m_RenderPass.Init(m_Context, m_Swapchain.GetFormat(), VK_FORMAT_D32_SFLOAT);
+
+        CreateFrameBuffers();
 
         LoadShaders((rootPath / "Engine" / "Shaders").string());
 

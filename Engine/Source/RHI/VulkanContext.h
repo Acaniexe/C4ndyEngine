@@ -12,6 +12,7 @@ namespace C4ndy::RHI
 
         void Init(void* windowHandle);
         void Shutdown();
+        void SetLayerPath(const std::string& dir) { m_LayerPath = dir; }
 
         VkInstance GetInstance() const { return m_Instance; }
         VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
@@ -24,7 +25,7 @@ namespace C4ndy::RHI
 
     private:
         #ifdef _DEBUG
-            static constexpr bool k_EnableValidation = false;
+            static constexpr bool k_EnableValidation = true;
         #else
             static constexpr bool k_EnableValidation = false;
         #endif
@@ -35,6 +36,9 @@ namespace C4ndy::RHI
         void PickPhysicalDevice();
         void CreateLogicalDevice();
         void DestroyDebugMessenger();
+
+        std::string m_LayerPath;
+        bool m_ValidationActive = false;
 
         VkInstance m_Instance = VK_NULL_HANDLE;
         VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;

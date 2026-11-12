@@ -3,6 +3,8 @@
 #include <cstring>
 #include <Core/Logger.h>
 #include <set>
+#include <cstdlib>
+#include <cstring>
 #if defined(C4NDY_PLATFORM_WINDOWS)
     #include <Windows.h>
     #include <vulkan/vulkan_win32.h>
@@ -31,7 +33,7 @@ namespace C4ndy::RHI
     {
         vkDestroyDevice(m_Device, nullptr);
 
-        if (k_EnableValidation)
+        if (m_ValidationActive)
             DestroyDebugMessenger();
 
         vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
@@ -42,6 +44,30 @@ namespace C4ndy::RHI
 
     void VulkanContext::CreateInstance()
     {
+        m_ValidationActive = false;
+        if (k_EnableValidation)
+        {
+            if (!m_LayerPath.empty())
+            {
+        #if defined(C4NDY_PLATFORM_WINDOWS)
+                SetEnvironmentVariableA("VK_LAYER_PATH", m_LayerPath.c_str());
+        #else
+                setenv("VK_LAYER_PATH", m_LayerPath.c_str(), 1);
+        #endif
+            }
+
+            u32 layerCount = 0;
+            vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+            std::vector<VkLayerProperties> layers(layerCount);
+            vkEnumerateInstanceLayerProperties(&layerCount, layers.data());
+
+            for (const auto& layer : layers)
+                if (strcmp(layer.layerName, k_ValidationLayer) == 0) { m_ValidationActive = true; break; }
+
+            if (!m_ValidationActive)
+                C4NDY_WARN("Validation layer not found - running without it. Run Setup to install it.");
+        }
+
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "C4ndy Engine";
@@ -61,22 +87,7 @@ namespace C4ndy::RHI
     #endif
         };
 
-        if (k_EnableValidation)
-        {
-            u32 layerCount;
-            vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-            std::vector<VkLayerProperties> layers(layerCount);
-            vkEnumerateInstanceLayerProperties(&layerCount, layers.data());
-
-            bool found = false;
-            for (const auto& layer : layers)
-                if (strcmp(layer.layerName, k_ValidationLayer) == 0) { found = true; break; }
-
-            if (!found)
-                C4NDY_WARN("Validation layer not available - running without it.");
-        }
-
-        if (k_EnableValidation)
+        if (m_ValidationActive)
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
         VkInstanceCreateInfo createInfo{};
@@ -84,16 +95,6 @@ namespace C4ndy::RHI
         createInfo.pApplicationInfo = &appInfo;
         createInfo.enabledExtensionCount = (u32)extensions.size();
         createInfo.ppEnabledExtensionNames = extensions.data();
-
-        if (k_EnableValidation)
-        {
-            createInfo.enabledLayerCount = 1;
-            createInfo.ppEnabledLayerNames = &k_ValidationLayer;
-        }
-        else
-        {
-            createInfo.enabledLayerCount = 0;
-        }
 
         if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS)
             C4NDY_FATAL("Failed to create Vulkan instance.");
@@ -119,7 +120,7 @@ namespace C4ndy::RHI
 
     void VulkanContext::SetupDebugMessenger()
     {
-        if (!k_EnableValidation) return;
+        if (!m_ValidationActive) return;
 
         VkDebugUtilsMessengerCreateInfoEXT createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -255,12 +256,6 @@ namespace C4ndy::RHI
         createInfo.pEnabledFeatures = &deviceFeatures;
         createInfo.enabledExtensionCount = (u32)ArrayCount(k_DeviceExtensions);
         createInfo.ppEnabledExtensionNames = k_DeviceExtensions;
-
-        if (k_EnableValidation)
-        {
-            createInfo.enabledLayerCount = 1;
-            createInfo.ppEnabledLayerNames = &k_ValidationLayer;
-        }
 
         if (vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device) != VK_SUCCESS)
             C4NDY_FATAL("Failed to create Vulkan logical device!");
