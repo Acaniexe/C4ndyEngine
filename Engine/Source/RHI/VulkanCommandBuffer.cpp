@@ -6,9 +6,10 @@ namespace C4ndy::RHI
 
     VulkanCommandBuffer::VulkanCommandBuffer() = default;
     
-    void VulkanCommandBuffer::Init(VulkanContext& context)
+    void VulkanCommandBuffer::Init(VulkanContext& context, u32 imageCount)
     {
         m_Context = &context;
+        m_ImageCount = imageCount;
         CreateCommandPool();
         CreateCommandBuffer();
         CreateSyncObjects();
@@ -17,7 +18,8 @@ namespace C4ndy::RHI
 
     void VulkanCommandBuffer::Shutdown()
     {
-        vkDestroySemaphore(m_Context->GetDevice(), m_RenderFinishedSemaphore, nullptr);
+        for (auto s : m_RenderFinishedSemaphore)
+            vkDestroySemaphore(m_Context->GetDevice(), s, nullptr);
         vkDestroySemaphore(m_Context->GetDevice(), m_ImageAvailableSemaphore, nullptr);
         vkDestroyFence(m_Context->GetDevice(), m_InFlightFence, nullptr);
         vkDestroyCommandPool(m_Context->GetDevice(), m_CommandPool, nullptr);
@@ -47,7 +49,7 @@ namespace C4ndy::RHI
         vkResetFences(m_Context->GetDevice(), 1, &m_InFlightFence);
     }
 
-    void VulkanCommandBuffer::Submit()
+    void VulkanCommandBuffer::Submit(u32 imageIndex)
     {
         VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
@@ -59,7 +61,7 @@ namespace C4ndy::RHI
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &m_CommandBuffer;
         submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = &m_RenderFinishedSemaphore;
+        submitInfo.pSignalSemaphores = &m_RenderFinishedSemaphore[imageIndex];
 
         if (vkQueueSubmit(m_Context->GetGraphicsQueue(), 1, &submitInfo, m_InFlightFence) != VK_SUCCESS)
             C4NDY_FATAL("Failed to submit command buffer!");
@@ -98,8 +100,12 @@ namespace C4ndy::RHI
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
         if (vkCreateSemaphore(m_Context->GetDevice(), &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore) != VK_SUCCESS ||
-            vkCreateSemaphore(m_Context->GetDevice(), &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore) != VK_SUCCESS ||
             vkCreateFence(m_Context->GetDevice(), &fenceInfo, nullptr, &m_InFlightFence) != VK_SUCCESS)
             C4NDY_FATAL("Failed to create sync objects!");
+
+        m_RenderFinishedSemaphore.resize(m_ImageCount);
+        for (auto& s : m_RenderFinishedSemaphore)
+            if (vkCreateSemaphore(m_Context->GetDevice(), &semaphoreInfo, nullptr, &s) != VK_SUCCESS)
+                C4NDY_FATAL("Failed to create render-finished semaphore!");
     }
 }

@@ -10,18 +10,18 @@ namespace C4ndy::RHI
         VulkanCommandBuffer();
         C4NDY_NON_COPYABLE_MOVEABLE(VulkanCommandBuffer);
 
-        void Init(VulkanContext& context);
+        void Init(VulkanContext& context, u32 imageCount);
         void Shutdown();
 
         void Begin();
         void End();
-        void Submit();
+        void Submit(u32 imageIndex);
         void Reset();
         void WaitForFence();
 
         VkCommandBuffer GetCommandBuffer() const { return m_CommandBuffer; }
         VkSemaphore GetImageAvailableSemaphore() const { return m_ImageAvailableSemaphore; }
-        VkSemaphore GetRenderFinishedSemaphore() const { return m_RenderFinishedSemaphore; }
+        VkSemaphore GetRenderFinishedSemaphore(u32 imageIndex) const { return m_RenderFinishedSemaphore[imageIndex]; }
 
     private:
         VulkanContext* m_Context = nullptr;
@@ -29,7 +29,8 @@ namespace C4ndy::RHI
         VkCommandBuffer m_CommandBuffer = VK_NULL_HANDLE;
 
         VkSemaphore m_ImageAvailableSemaphore = VK_NULL_HANDLE;
-        VkSemaphore m_RenderFinishedSemaphore = VK_NULL_HANDLE;
+        std::vector<VkSemaphore> m_RenderFinishedSemaphore;
+        u32 m_ImageCount = 0;
         VkFence m_InFlightFence = VK_NULL_HANDLE;
 
         void CreateCommandPool();

@@ -27,7 +27,7 @@
       "extract_to": "Engine/ThirdParty/Vulkan/Bin/Linux", "check": "glslc", "executable": true },
 
     { "name": "validation-linux", "platform": "linux", "file": "validation-linux.tar.gz",
-      "sha256": "7761f019749dd47c7eaa119bc8d1cb83aedcf874ed11c32a1c2664dc3615ded7 ",
+      "sha256": "7761f019749dd47c7eaa119bc8d1cb83aedcf874ed11c32a1c2664dc3615ded7",
       "extract_to": "Engine/ThirdParty/Vulkan/Layers/Linux", "check": "libVkLayer_khronos_validation.so" },
 
     { "name": "vulkan-licenses", "platform": "all", "file": "licenses.zip",

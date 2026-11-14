@@ -81,7 +81,7 @@ namespace C4ndy::Renderer
         m_Pipeline.SetExtent(m_Swapchain.GetExtent());
         m_Pipeline.Build();
 
-        m_CommandBuffer.Init(m_Context);
+        m_CommandBuffer.Init(m_Context, m_Swapchain.GetImageCount());
 
         m_CameraBuffer.Init(m_Context, sizeof(CameraData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
         m_CameraBuffer.Map();
@@ -278,9 +278,9 @@ namespace C4ndy::Renderer
     {
         m_RenderPass.End(m_CommandBuffer.GetCommandBuffer());
         m_CommandBuffer.End();
-        m_CommandBuffer.Submit();
+        m_CommandBuffer.Submit(m_CurrentImageIndex);
         
-        if (m_Swapchain.Present(m_CommandBuffer.GetRenderFinishedSemaphore(), m_CurrentImageIndex))
+        if (m_Swapchain.Present(m_CommandBuffer.GetRenderFinishedSemaphore(m_CurrentImageIndex), m_CurrentImageIndex))
         {
             if (m_Window)
             {

@@ -108,12 +108,15 @@ namespace C4ndy::RHI
         const VkDebugUtilsMessengerCallbackDataEXT* data,
         void* userData)
     {
-         if (severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+        C4NDY_UNUSED(type);
+        C4NDY_UNUSED(userData);
+
+        if (severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
             C4NDY_ERROR(std::string("[VULKAN] ") + data->pMessage);
-         else if (severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
-             C4NDY_WARN(std::string("[VULKAN] ") + data->pMessage);
+        else if (severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+            C4NDY_WARN(std::string("[VULKAN] ") + data->pMessage);
         else
-             C4NDY_INFO(std::string("[VULKAN] ") + data->pMessage);
+            C4NDY_INFO(std::string("[VULKAN] ") + data->pMessage);
 
         return VK_FALSE;
     }
